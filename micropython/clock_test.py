@@ -1,3 +1,7 @@
+# Copyright (c) 2022 Richard Titmuss
+#
+# SPDX-License-Identifier: MIT
+
 from clock import Clock
 import unittest
 
