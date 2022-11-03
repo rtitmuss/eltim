@@ -1,0 +1,15 @@
+{
+  "urls": [
+    ["clock.py", "github:rtitmuss/eltim/micropython/clock.py"],
+    ["config.py", "github:rtitmuss/eltim/micropython/config.py"],
+    ["display.py", "github:rtitmuss/eltim/micropython/display.py"],
+    ["main.py", "github:rtitmuss/eltim/micropython/main.py"],
+    ["price.py", "github:rtitmuss/eltim/micropython/price.py"],
+    ["tibber.py", "github:rtitmuss/eltim/micropython/tibber.py"],
+    ["wlan.py", "github:rtitmuss/eltim/micropython/wlan.py"]
+  ],
+  "deps": [
+    ["unittest", "latest"]
+  ],
+  "version": "0.1"
+}
