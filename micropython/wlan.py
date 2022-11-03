@@ -42,7 +42,7 @@ def connect(ssid, password, timezone):
 
     print('wifi connected {}'.format(wlan.ifconfig()))
 
-    _retry('ntp', lambda: ntptime.settime)
+    _retry('ntp', ntptime.settime)
     _retry('timezone', lambda: Clock.set_timezone(timezone))
 
     return True
