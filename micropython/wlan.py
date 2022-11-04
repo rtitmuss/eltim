@@ -37,7 +37,6 @@ def connect(ssid, password, timezone):
     _retry('wifi', lambda: wlan.isconnected() or wlan.status() < 0)
 
     if not wlan.isconnected():
-        display.show_status(now, 'error', 'wifi ...')
         return False
 
     print('wifi connected {}'.format(wlan.ifconfig()))

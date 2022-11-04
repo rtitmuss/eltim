@@ -113,7 +113,11 @@ def gc_tick():
 
 def wlan_connect(now):
     display.show_status(now, 'connecting', 'wifi ...')
-    return wlan.connect(WIFI_SSID, WIFI_PASSWORD, TIMEZONE)
+    if not wlan.connect(WIFI_SSID, WIFI_PASSWORD, TIMEZONE):
+        display.show_status(now, 'error', 'wifi ...')
+        return False
+
+    return True
 
 
 button_a = Button(12 if not ROTATE else 15)
