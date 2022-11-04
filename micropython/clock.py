@@ -23,11 +23,11 @@ class Clock:
     @staticmethod
     def set_timezone(timezone):
         response = urequests.get(
-            'http://worldtimeapi.org/api/timezone/{}'.format(timezone))
+            'https://timeapi.io/api/TimeZone/zone?timeZone={}'.format(timezone))
         data = response.json()
         response.close()
 
-        Clock.utc_offset_sec = data['raw_offset'] + data['dst_offset']
+        Clock.utc_offset_sec = data['currentUtcOffset']['seconds']
 
     def __str__(self):
         hour = self.hour
