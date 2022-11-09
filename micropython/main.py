@@ -21,19 +21,16 @@ from config import *
 MAX_TIME_OFFSET = 10
 
 
-def print_appliance(now, pricePerHour, appliance):
-    cost = price.appliance_cost(pricePerHour, now, appliance['kwhPerHour'])
-    cheapestTime, cheapestCost = price.cheapest_hour_and_cost(
-        pricePerHour, now, appliance['kwhPerHour'])
-
-    print('{}: now {:.2f} {}. cheapest {:.2f} {} saving {:.2f} {} at {} in {} is {}'.format( \
-        appliance['name'], \
-        cost, CURRENCY, \
-        cheapestCost, CURRENCY, \
-        cost - cheapestCost, CURRENCY, \
-        cheapestTime, \
-        now.diff(cheapestTime), \
-        levelPerHour[cheapestTime.hour]))
+def highest_level(level):
+    if 'VERY_EXPENSIVE' in level:
+        return 'VERY_EXPENSIVE'
+    if 'EXPENSIVE' in level:
+        return 'EXPENSIVE'
+    if 'NORMAL' in level:
+        return 'NORMAL'
+    if 'CHEAP' in level:
+        return 'CHEAP'
+    return 'VERY_CHEAP'
 
 
 def display_appliance(now, pricePerHour, levelPerHour):
@@ -59,16 +56,29 @@ def display_appliance(now, pricePerHour, levelPerHour):
                            cheapestTime, cheapestCost, cheapestLevel)
 
 
-def highest_level(level):
-    if 'VERY_EXPENSIVE' in level:
-        return 'VERY_EXPENSIVE'
-    if 'EXPENSIVE' in level:
-        return 'EXPENSIVE'
-    if 'NORMAL' in level:
-        return 'NORMAL'
-    if 'CHEAP' in level:
-        return 'CHEAP'
-    return 'VERY_CHEAP'
+def reset_time_offset(now):
+    global time_offset
+    time_offset = 0
+
+
+def render(now):
+    if len(pricePerHour) > 0:
+        display_appliance(now, pricePerHour, levelPerHour)
+
+
+def print_appliance(now, pricePerHour, appliance):
+    cost = price.appliance_cost(pricePerHour, now, appliance['kwhPerHour'])
+    cheapestTime, cheapestCost = price.cheapest_hour_and_cost(
+        pricePerHour, now, appliance['kwhPerHour'])
+
+    print('{}: now {:.2f} {}. cheapest {:.2f} {} saving {:.2f} {} at {} in {} is {}'.format( \
+        appliance['name'], \
+        cost, CURRENCY, \
+        cheapestCost, CURRENCY, \
+        cost - cheapestCost, CURRENCY, \
+        cheapestTime, \
+        now.diff(cheapestTime), \
+        levelPerHour[cheapestTime.hour]))
 
 
 def tick(now):
@@ -121,11 +131,6 @@ def load_prices(now):
         task.add_task('load_prices', 1000, load_prices)
 
 
-def render(now):
-    if len(pricePerHour) > 0:
-        display_appliance(now, pricePerHour, levelPerHour)
-
-
 def wlan_connect(now):
     display.show_status(now, 'connecting', 'wifi ...')
     if not wlan.connect(WIFI_SSID, WIFI_PASSWORD, TIMEZONE):
@@ -133,11 +138,6 @@ def wlan_connect(now):
         return False
 
     return True
-
-
-def reset_time_offset(now):
-    global time_offset
-    time_offset = 0
 
 
 buttons = list(
