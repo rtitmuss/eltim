@@ -1,3 +1,7 @@
+# Copyright (c) 2022 Richard Titmuss
+#
+# SPDX-License-Identifier: MIT
+
 import time
 
 tasks = {}
@@ -20,6 +24,8 @@ def exec_tasks(*args):
 
     for key, task in ready.items():
         del tasks[key]
-        task['callback'](*args)
+        delay_ms = task['callback'](*args)
+        if delay_ms != None:
+            add_task(key, delay_ms, task['callback'])
 
     return len(ready) > 0

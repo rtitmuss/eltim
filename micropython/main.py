@@ -91,54 +91,43 @@ def print_appliance(now, pricePerHour, appliance):
         levelPerHour[cheapestTime.hour]))
 
 
-def tick(now):
+def load_prices(now):
     global pricePerHour, levelPerHour
 
+    pricePerHour = ()
+    levelPerHour = ()
+
+    if not wlan_connect(now):
+        return False
+
+    print('loading tibber prices')
+    display.show_status(now, 'loading', 'tibber ...')
+    pricePerHour, levelPerHour = tibber.fetch_price_info(TIBBER_TOKEN)
+
+    for i in range(len(pricePerHour)):
+        pricePerHour[i] += GRID_PRICE
+
+    wlan.disconnect()
+
+    return len(pricePerHour) != 0
+
+
+def check_prices(now):
     print('\n{}'.format(now))
 
     if price.should_update(pricePerHour, now):
-        pricePerHour = ()
-        levelPerHour = ()
+        if not load_prices(now):
+            return 60 * 1000  # retry in 1 minute
 
-        if not wlan_connect(now):
-            return False
-
-        print('loading tibber prices')
-        display.show_status(now, 'loading', 'tibber ...')
-        pricePerHour, levelPerHour = tibber.fetch_price_info(TIBBER_TOKEN)
-
-        for i in range(len(pricePerHour)):
-            pricePerHour[i] += GRID_PRICE
-
-        wlan.disconnect()
-
-        if len(pricePerHour) == 0:
-            return False
+    gc.collect()
+    micropython.mem_info()
 
     print('level: {} {:.2f} {}'.format(levelPerHour[now.hour],
                                        pricePerHour[now.hour], CURRENCY))
     for appliance in APPLIANCE:
         print_appliance(now, pricePerHour, appliance)
 
-    return True
-
-
-def gc_tick():
-    gc.collect()
-    print('\nInitial free: {} allocated: {}'.format(gc.mem_free(),
-                                                    gc.mem_alloc()))
-    micropython.mem_info()
-
-
-def load_prices(now):
-    ok = tick(now)
-    gc_tick()
-
-    if ok:
-        task.add_task('load_prices',
-                      Clock.now().round_up(1) * 1000, load_prices)
-    else:
-        task.add_task('load_prices', 1000, load_prices)
+    return Clock.now().round_up(15) * 1000  # on every quarter hour
 
 
 def wlan_connect(now):
@@ -163,7 +152,7 @@ pricePerHour = ()
 levelPerHour = ()
 
 wlan_connect(Clock.now())
-task.add_task('load_prices', 0, load_prices)
+task.add_task('check_prices', 0, check_prices)
 
 while True:
     now = Clock.now()
