@@ -6,13 +6,13 @@ import gc
 import machine
 import math
 import micropython
-import time
 
 from pimoroni import Button
 
 from clock import Clock
 from display import Display
 import price
+import task
 import tibber
 import wlan
 
@@ -100,7 +100,6 @@ def tick(now):
     for appliance in APPLIANCE:
         print_appliance(now, pricePerHour, appliance)
 
-    display_appliance(now, pricePerHour, levelPerHour)
     return True
 
 
@@ -109,6 +108,22 @@ def gc_tick():
     print('\nInitial free: {} allocated: {}'.format(gc.mem_free(),
                                                     gc.mem_alloc()))
     micropython.mem_info()
+
+
+def load_prices(now):
+    ok = tick(now)
+    gc_tick()
+
+    if ok:
+        task.add_task('load_prices',
+                      Clock.now().round_up(1) * 1000, load_prices)
+    else:
+        task.add_task('load_prices', 1000, load_prices)
+
+
+def render(now):
+    if len(pricePerHour) > 0:
+        display_appliance(now, pricePerHour, levelPerHour)
 
 
 def wlan_connect(now):
@@ -120,8 +135,14 @@ def wlan_connect(now):
     return True
 
 
-buttons = list(map(lambda pin: Button(pin),
-               (12, 13, 14, 15) if not ROTATE else (14, 15, 13, 12)))
+def reset_time_offset(now):
+    global time_offset
+    time_offset = 0
+
+
+buttons = list(
+    map(lambda pin: Button(pin), (12, 13, 14, 15) if not ROTATE else
+        (14, 15, 13, 12)))
 
 display = Display(ROTATE)
 
@@ -132,28 +153,21 @@ pricePerHour = ()
 levelPerHour = ()
 
 wlan_connect(Clock.now())
-
-next_tick = time.ticks_add(time.ticks_ms(), 0)
+task.add_task('load_prices', 0, load_prices)
 
 while True:
     now = Clock.now()
 
-    if time.ticks_diff(next_tick, time.ticks_ms()) < 0:
-        time_offset = 0
-        ok = tick(now)
-        gc_tick()
-
-        delay_ms = 10000 if not ok else Clock.now().round_up(15) * 1000
-        next_tick = time.ticks_add(time.ticks_ms(), delay_ms)
+    task_run = task.exec_tasks(now)
 
     pressed = list(map(lambda button: button.read(), buttons))
 
     if pressed[0]:
         appliance_idx = (appliance_idx + 1) % len(APPLIANCE)
-        tick(now)
 
     if pressed[1]:
         time_offset = (time_offset + 1) % MAX_TIME_OFFSET
-        tick(now)
+        task.add_task('time_offset', 5000, reset_time_offset)
 
-        next_tick = time.ticks_add(time.ticks_ms(), 5000)
+    if any(pressed) or task_run:
+        render(now)

@@ -5,6 +5,7 @@
     ["display.py", "github:rtitmuss/eltim/micropython/display.py"],
     ["main.py", "github:rtitmuss/eltim/micropython/main.py"],
     ["price.py", "github:rtitmuss/eltim/micropython/price.py"],
+    ["task.py", "github:rtitmuss/eltim/micropython/task.py"],
     ["tibber.py", "github:rtitmuss/eltim/micropython/tibber.py"],
     ["wlan.py", "github:rtitmuss/eltim/micropython/wlan.py"]
   ],
