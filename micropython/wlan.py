@@ -50,3 +50,4 @@ def connect(ssid, password, timezone):
 def disconnect():
     wlan.disconnect()
     wlan.active(False)
+    wlan.deinit()
