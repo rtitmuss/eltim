@@ -26,7 +26,7 @@ def cheapest_hour_and_cost(hourly_prices, time, kwh_per_hour):
     cost_per_hour = list(map(lambda i: _appliance_cost(hourly_prices[i:], kwh_per_hour), \
                              range(next_hour, len(hourly_prices) - len(kwh_per_hour))))
 
-    min_cost = min(cost_per_hour)
+    min_cost = min(cost_per_hour[:12])
     min_hour = cost_per_hour.index(min_cost)
 
     return Clock(next_hour + min_hour), cost_per_hour[min_hour]

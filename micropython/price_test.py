@@ -37,6 +37,9 @@ class TestHourlyPricesMethods(unittest.TestCase):
         self.assertEqual(cheapest_hour_and_cost(prices, Clock(0), [10, 10]),
                          (Clock(1), 30))
 
+        prices = (14, 13, 12, 11, 10, 9, 8, 7, 7, 5, 4, 3, 2, 1)
+        self.assertEqual(cheapest_hour_and_cost(prices, Clock(0), [1]),
+                         (Clock(12), 2))
 
 if __name__ == '__main__':
     unittest.main()
