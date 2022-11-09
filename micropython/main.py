@@ -18,7 +18,7 @@ import wlan
 
 from config import *
 
-MAX_TIME_OFFSET = 6
+MAX_TIME_OFFSET = 10
 
 
 def print_appliance(now, pricePerHour, appliance):
