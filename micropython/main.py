@@ -120,10 +120,8 @@ def wlan_connect(now):
     return True
 
 
-button_a = Button(12 if not ROTATE else 15)
-button_b = Button(13 if not ROTATE else 14)
-button_x = Button(14 if not ROTATE else 13)
-button_y = Button(15 if not ROTATE else 12)
+buttons = list(map(lambda pin: Button(pin),
+               (12, 13, 14, 15) if not ROTATE else (14, 15, 13, 12)))
 
 display = Display(ROTATE)
 
@@ -148,11 +146,13 @@ while True:
         delay_ms = 10000 if not ok else Clock.now().round_up(15) * 1000
         next_tick = time.ticks_add(time.ticks_ms(), delay_ms)
 
-    if button_a.read():
+    pressed = list(map(lambda button: button.read(), buttons))
+
+    if pressed[0]:
         appliance_idx = (appliance_idx + 1) % len(APPLIANCE)
         tick(now)
 
-    if button_b.read():
+    if pressed[1]:
         time_offset = (time_offset + 1) % MAX_TIME_OFFSET
         tick(now)
 
