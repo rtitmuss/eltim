@@ -23,7 +23,8 @@ class Clock:
     @staticmethod
     def set_timezone(timezone):
         response = urequests.get(
-            'https://timeapi.io/api/TimeZone/zone?timeZone={}'.format(timezone))
+            'https://timeapi.io/api/TimeZone/zone?timeZone={}'.format(
+                timezone))
         data = response.json()
         response.close()
 

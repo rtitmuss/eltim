@@ -41,5 +41,6 @@ class TestHourlyPricesMethods(unittest.TestCase):
         self.assertEqual(cheapest_hour_and_cost(prices, Clock(0), [1]),
                          (Clock(12), 2))
 
+
 if __name__ == '__main__':
     unittest.main()

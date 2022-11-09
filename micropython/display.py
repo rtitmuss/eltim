@@ -22,14 +22,15 @@ class Display:
     def __init__(self, rotate=False):
         self.led = RGBLED(6, 7, 8)
         self.led.set_rgb(0, 0, 0)
-        
+
         # work around for https://github.com/pimoroni/pimoroni-pico/issues/562
         if rotate:
             display = PicoGraphics(display=DISPLAY_PICO_DISPLAY,
-                                   pen_type=PEN_P4, rotate=0)
+                                   pen_type=PEN_P4,
+                                   rotate=0)
             black = display.create_pen(0, 0, 0)
             display.set_pen(black)
-            display.clear()    
+            display.clear()
 
         display = PicoGraphics(display=DISPLAY_PICO_DISPLAY,
                                pen_type=PEN_P4,
