@@ -61,7 +61,17 @@ def reset_time_offset(now):
     time_offset = 0
 
 
-def render(now):
+def render(now, pressed):
+    global appliance_idx
+    global time_offset
+
+    if pressed[0]:
+        appliance_idx = (appliance_idx + 1) % len(APPLIANCE)
+
+    if pressed[1]:
+        time_offset = (time_offset + 1) % MAX_TIME_OFFSET
+        task.add_task('time_offset', 5000, reset_time_offset)
+
     if len(pricePerHour) > 0:
         display_appliance(now, pricePerHour, levelPerHour)
 
@@ -162,12 +172,5 @@ while True:
 
     pressed = list(map(lambda button: button.read(), buttons))
 
-    if pressed[0]:
-        appliance_idx = (appliance_idx + 1) % len(APPLIANCE)
-
-    if pressed[1]:
-        time_offset = (time_offset + 1) % MAX_TIME_OFFSET
-        task.add_task('time_offset', 5000, reset_time_offset)
-
     if any(pressed) or task_run:
-        render(now)
+        render(now, pressed)
