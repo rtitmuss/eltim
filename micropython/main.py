@@ -141,7 +141,7 @@ def wlan_connect(now):
 
 buttons = list(
     map(lambda pin: Button(pin), (12, 13, 14, 15) if not ROTATE else
-        (14, 15, 13, 12)))
+        (15, 14, 13, 12)))
 
 display = Display(ROTATE)
 
