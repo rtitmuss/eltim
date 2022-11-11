@@ -157,6 +157,7 @@ wlan_connect(Clock.now())
 if ota.check_for_update('rtitmuss', 'eltim'):
     display.show_status(Clock.now(), 'firmware', 'update ...')
     ota.install_update('rtitmuss', 'eltim')
+    wlan.disconnect()
     machine.reset()
 
 task.add_task('check_prices', 0, check_prices)
