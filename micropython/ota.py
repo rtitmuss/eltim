@@ -46,10 +46,14 @@ def _rmdir(directory):
 
 
 def check_for_update(owner, repo, branch='main') -> Bool:
-    github_version = _github_latest_version(owner, repo, branch)
-    local_version = _local_latest_version()
+    try:
+        github_version = _github_latest_version(owner, repo, branch)
+        local_version = _local_latest_version()
 
-    return github_version != local_version
+        return github_version != local_version
+    except Exception as e:
+        print('check_for_update error: {} {}'.format(type(e), e))
+        return False
 
 
 def install_update(owner, repo, branch='main'):
