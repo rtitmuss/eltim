@@ -11,6 +11,7 @@ from pimoroni import Button
 
 from clock import Clock
 from display import Display
+import ota
 import price
 import task
 import tibber
@@ -152,6 +153,12 @@ pricePerHour = ()
 levelPerHour = ()
 
 wlan_connect(Clock.now())
+
+if ota.check_for_update('rtitmuss', 'eltim'):
+    display.show_status(Clock.now(), 'firmware', 'update ...')
+    ota.install_update('rtitmuss', 'eltim')
+    machine.reset()
+
 task.add_task('check_prices', 0, check_prices)
 
 while True:
