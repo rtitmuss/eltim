@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import mip
 import os
 import urequests
 
@@ -57,6 +56,8 @@ def check_for_update(owner, repo, branch='main') -> Bool:
 
 
 def install_update(owner, repo, branch='main'):
+    import mip
+
     github_version = _github_latest_version(owner, repo, branch)
 
     # ensure cleanup
