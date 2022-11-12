@@ -9,7 +9,13 @@ A gadget to show the cheapest electric prices using tibber api
 
 Install MicroPython with support for the Pico Display Plack from https://github.com/pimoroni/pimoroni-pico/releases/latest/
 
-Install eltime using `mpremote connect /dev/tty.usbmodem14??? soft-reset mip install --target . github:rtitmuss/eltim`
+Then install eltime using:
+```
+mpremote connect /dev/tty.usbmodem14??? soft-reset mip install --target app github:rtitmuss/eltim
+mpremote connect /dev/tty.usbmodem14??? mip install --target . github:rtitmuss/eltim/main.py
+```
+
+Any future updates are automatically installed by OTA from github.
 
 ## Development
 
