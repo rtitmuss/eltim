@@ -7,12 +7,11 @@ import micropython
 
 from eltim import Eltim
 from kernel import Kernel
-import config
 
 gc.collect()
 micropython.mem_info()
 
-kernel = Kernel(config)
+kernel = Kernel()
 
 kernel.wlan_connect()
 kernel.install_any_updates('rtitmuss', 'eltim')
@@ -20,4 +19,4 @@ kernel.install_any_updates('rtitmuss', 'eltim')
 gc.collect()
 micropython.mem_info()
 
-kernel.run(Eltim(kernel, config))
+kernel.run(Eltim(kernel))

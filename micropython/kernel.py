@@ -12,10 +12,13 @@ from display import Display
 import ota
 import wlan
 
+import config
 
 class Kernel:
 
-    def __init__(self, config):
+    def __init__(self):
+        self.config = config
+
         self.display = Display(config.ROTATE)
         self.buttons = list(
             map(lambda pin: Button(pin),

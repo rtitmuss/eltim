@@ -27,9 +27,9 @@ def _highest_level(level):
 
 class Eltim:
 
-    def __init__(self, kernel, config):
+    def __init__(self, kernel):
         self.kernel = kernel
-        self.config = config
+        self.config = kernel.config
 
         self.appliance_idx = 0
         self.time_offset = 0
