@@ -12,6 +12,7 @@
     ["wlan.py", "github:rtitmuss/eltim/micropython/wlan.py"]
   ],
   "deps": [
+    ["mip", "latest"],
     ["unittest", "latest"]
   ],
   "version": "0.1"
