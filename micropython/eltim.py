@@ -27,9 +27,10 @@ def _highest_level(level):
 
 class Eltim:
 
-    def __init__(self, kernel):
+    def __init__(self, kernel, display):
         self.kernel = kernel
         self.config = kernel.config
+        self.display = display
 
         self.appliance_idx = 0
         self.time_offset = 0
@@ -79,7 +80,7 @@ class Eltim:
             return False
 
         print('loading tibber prices')
-        self.kernel.display.show_status(now, 'loading', 'tibber ...')
+        self.display.show_status(now, 'loading', 'tibber ...')
         self.pricePerHour, self.levelPerHour = tibber.fetch_price_info(
             self.config.TIBBER_TOKEN)
 
@@ -125,12 +126,11 @@ class Eltim:
             self.levelPerHour[cheapestTime.hour:cheapestTime.hour +
                               len(appliance['kwhPerHour'])])
 
-        self.kernel.display.show_appliance(appliance['name'],
-                                           self.config.CURRENCY,
-                                           self.appliance_idx,
-                                           len(self.config.APPLIANCE), now,
-                                           time, cost, level, cheapestTime,
-                                           cheapestCost, cheapestLevel)
+        self.display.show_appliance(appliance['name'], self.config.CURRENCY,
+                                    self.appliance_idx,
+                                    len(self.config.APPLIANCE), now, time,
+                                    cost, level, cheapestTime, cheapestCost,
+                                    cheapestLevel)
 
     def _reset_time_offset(self):
         self.time_offset = 0

@@ -8,18 +8,19 @@ import time
 from pimoroni import Button
 
 from clock import Clock
-from display import Display
 import ota
 import wlan
 
 import config
 
+
 class Kernel:
 
-    def __init__(self):
+    def __init__(self, show_status):
+        self.show_status = show_status
+
         self.config = config
 
-        self.display = Display(config.ROTATE)
         self.buttons = list(
             map(lambda pin: Button(pin),
                 (12, 13, 14, 15) if not config.ROTATE else (15, 14, 13, 12)))
@@ -50,9 +51,9 @@ class Kernel:
         return len(ready) > 0
 
     def wlan_connect(self, now=Clock.now()):
-        self.display.show_status(now, 'connecting', 'wifi ...')
+        self.show_status(now, 'connecting', 'wifi ...')
         if not wlan.connect(self.WIFI_SSID, self.WIFI_PASSWORD, self.TIMEZONE):
-            self.display.show_status(now, 'error', 'wifi ...')
+            self.show_status(now, 'error', 'wifi ...')
             return False
 
         return True
@@ -62,7 +63,7 @@ class Kernel:
 
     def install_any_updates(self, owner, repo):
         if ota.check_for_update(owner, repo):
-            self.display.show_status(Clock.now(), 'firmware', 'update ...')
+            self.show_status(Clock.now(), 'firmware', 'update ...')
             ota.install_update(owner, repo)
             wlan.disconnect()
             machine.reset()
