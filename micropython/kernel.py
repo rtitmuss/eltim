@@ -62,9 +62,9 @@ class Kernel:
         wlan.disconnect()
 
     def install_any_updates(self, owner, repo):
-        if ota.check_for_update(owner, repo):
+        if ota.check_for_update(owner, repo, 'app'):
             self.show_status(Clock.now(), 'firmware', 'update ...')
-            ota.install_update(owner, repo)
+            ota.install_update(owner, repo, 'app')
             wlan.disconnect()
             machine.reset()
 

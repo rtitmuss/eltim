@@ -5,9 +5,6 @@
 import os
 import urequests
 
-APP_DIR = '/app'
-OLD_DIR = '/old'
-NEW_DIR = '/new'
 VERSION_FILE = '.version'
 
 
@@ -23,9 +20,9 @@ def _github_latest_version(owner, repo, branch):
     return data['commit']['sha']
 
 
-def _local_latest_version():
-    if VERSION_FILE in os.listdir(APP_DIR):
-        with open('{}/{}'.format(APP_DIR, VERSION_FILE)) as f:
+def _local_latest_version(target):
+    if VERSION_FILE in os.listdir(target):
+        with open('{}/{}'.format(target, VERSION_FILE)) as f:
             return f.read()
     return None
 
@@ -44,10 +41,10 @@ def _rmdir(directory):
         return
 
 
-def check_for_update(owner, repo, branch='main') -> Bool:
+def check_for_update(owner, repo, target, branch='main') -> Bool:
     try:
         github_version = _github_latest_version(owner, repo, branch)
-        local_version = _local_latest_version()
+        local_version = _local_latest_version(target)
 
         return github_version != local_version
     except Exception as e:
@@ -55,25 +52,28 @@ def check_for_update(owner, repo, branch='main') -> Bool:
         return False
 
 
-def install_update(owner, repo, branch='main'):
+def install_update(owner, repo, target, branch='main'):
     import mip
 
     github_version = _github_latest_version(owner, repo, branch)
 
+    old_dir = '{}.old'.format(target)
+    new_dir = '{}.new'.format(target)
+
     # ensure cleanup
-    _rmdir(OLD_DIR)
-    _rmdir(NEW_DIR)
+    _rmdir(old_dir)
+    _rmdir(new_dir)
 
     # download
     print('Installing version {}'.format(github_version))
     mip.install('github:{}/{}'.format(owner, repo),
-                target=NEW_DIR,
+                target=new_dir,
                 version=github_version)
 
-    with open('{}/{}'.format(NEW_DIR, VERSION_FILE), 'w') as f:
+    with open('{}/{}'.format(new_dir, VERSION_FILE), 'w') as f:
         f.write(github_version)
 
     # install
-    os.rename(APP_DIR, OLD_DIR)
-    os.rename(NEW_DIR, APP_DIR)
-    _rmdir(OLD_DIR)
+    os.rename(target, old_dir)
+    os.rename(new_dir, target)
+    _rmdir(old_dir)
