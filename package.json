@@ -8,7 +8,6 @@
     ["main.py", "github:rtitmuss/eltim/micropython/main.py"],
     ["ota.py", "github:rtitmuss/eltim/micropython/ota.py"],
     ["price.py", "github:rtitmuss/eltim/micropython/price.py"],
-    ["task.py", "github:rtitmuss/eltim/micropython/task.py"],
     ["tibber.py", "github:rtitmuss/eltim/micropython/tibber.py"],
     ["wlan.py", "github:rtitmuss/eltim/micropython/wlan.py"]
   ],
