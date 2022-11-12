@@ -11,7 +11,8 @@ VERSION_FILE = '.version'
 def _github_latest_version(owner, repo, branch):
     response = urequests.get(
         'https://api.github.com/repos/{}/{}/branches/{}'.format(
-            owner, repo, branch),
+            owner,
+            repo.split('/', 1)[0], branch),
         headers={'User-Agent': 'micropython'})
 
     data = response.json()

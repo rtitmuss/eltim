@@ -62,9 +62,17 @@ class Kernel:
         wlan.disconnect()
 
     def install_any_updates(self, owner, repo):
-        if ota.check_for_update(owner, repo, 'app'):
+        is_app_update = ota.check_for_update(owner, repo, 'app')
+        is_kernel_update = ota.check_for_update('rtitmuss', 'eltim/picokernel',
+                                                'picokernel')
+
+        if is_app_update or is_kernel_update:
             self.show_status(Clock.now(), 'firmware', 'update ...')
-            ota.install_update(owner, repo, 'app')
+            if (is_app_update):
+                ota.install_update(owner, repo, 'app')
+            if (is_kernel_update):
+                ota.install_update('rtitmuss', 'eltim/picokernel',
+                                   'picokernel')
             wlan.disconnect()
             machine.reset()
 
