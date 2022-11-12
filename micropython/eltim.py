@@ -14,15 +14,11 @@ MAX_TIME_OFFSET = 10
 
 
 def _highest_level(level):
-    if 'VERY_EXPENSIVE' in level:
-        return 'VERY_EXPENSIVE'
-    if 'EXPENSIVE' in level:
-        return 'EXPENSIVE'
+    if 'HIGH' in level:
+        return 'HIGH'
     if 'NORMAL' in level:
         return 'NORMAL'
-    if 'CHEAP' in level:
-        return 'CHEAP'
-    return 'VERY_CHEAP'
+    return 'LOW'
 
 
 class Eltim:

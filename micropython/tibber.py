@@ -6,13 +6,8 @@ import array
 import urequests as requests
 
 _QUERY = const(
-    """{ viewer { homes { currentSubscription { priceInfo { today { startsAt total level } tomorrow { startsAt total level } } } } }}"""
+    """{ viewer { homes { currentSubscription { priceInfo { current { startsAt } } priceRating { hourly { entries { total time level } } } } } } }"""
 )
-
-
-def _chain(*p):
-    for i in p:
-        yield from i
 
 
 def fetch_price_info(token):
@@ -24,11 +19,17 @@ def fetch_price_info(token):
         data = response.json()
         response.close()
 
-        price_info = data['data']['viewer']['homes'][0]['currentSubscription'][
-            'priceInfo']
+        subscription = data['data']['viewer']['homes'][0][
+            'currentSubscription']
 
-        return array.array('f', map(lambda e: e['total'], _chain(price_info['today'], price_info['tomorrow']))), \
-               list(map(lambda e: e['level'], _chain(price_info['today'], price_info['tomorrow'])))
+        today = subscription['priceInfo']['current']['startsAt'][:10]
+        price_rating = subscription['priceRating']['hourly']['entries']
+
+        today_tomorrow_rating = list(
+            filter(lambda e: e['time'] >= today, price_rating))
+
+        return array.array('f', map(lambda e: e['total'], today_tomorrow_rating)), \
+               list(map(lambda e: e['level'], today_tomorrow_rating))
 
     except Exception as e:
         print('tibber error: {} {}'.format(type(e), e))

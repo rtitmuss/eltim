@@ -44,7 +44,7 @@ class Display:
         self.YELLOW = display.create_pen(255, 255, 0)
 
     def level_to_color(self, level):
-        if level in ('CHEAP', 'VERY_CHEAP'):
+        if level == 'LOW':
             return self.GREEN
         elif level == 'NORMAL':
             return self.YELLOW
@@ -77,9 +77,9 @@ class Display:
         now_level = level[0]
         time_level = level[time_offset]
 
-        if now_level in ('CHEAP', 'VERY_CHEAP'):
+        if now_level == 'LOW':
             self.led.set_rgb(0, 16, 0)  # green
-        elif now_level in ('EXPENSIVE', 'VERY_EXPENSIVE'):
+        elif now_level == 'HIGH':
             self.led.set_rgb(16, 0, 0)  # red
         else:
             self.led.set_rgb(0, 0, 0)  # off
