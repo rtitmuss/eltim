@@ -1,0 +1,12 @@
+{
+  "urls": [
+    ["clock.py", "github:rtitmuss/eltim/picokernel/micropython/clock.py"],
+    ["kernel.py", "github:rtitmuss/eltim/picokernel/micropython/kernel.py"],
+    ["ota.py", "github:rtitmuss/eltim/picokernel/micropython/ota.py"],
+    ["wlan.py", "github:rtitmuss/eltim/picokernel/micropython/wlan.py"]
+  ],
+  "deps": [
+    ["mip", "latest"]
+  ],
+  "version": "0.1"
+}
