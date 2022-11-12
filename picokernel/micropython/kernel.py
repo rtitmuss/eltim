@@ -37,6 +37,9 @@ class Kernel:
             'callback': callback
         }
 
+    def cancel_task(self, name):
+        del self.tasks[name]
+
     def exec_tasks(self, *args):
         now_ms = time.ticks_ms()
         ready = dict((k, v) for k, v in self.tasks.items()
@@ -76,7 +79,10 @@ class Kernel:
             wlan.disconnect()
             machine.reset()
 
-    def run(self, app):
+    def set_screen(self, screen):
+        self.screen = screen
+
+    def run(self):
         while True:
             now = Clock.now()
 
@@ -84,5 +90,6 @@ class Kernel:
 
             pressed = list(map(lambda button: button.read(), self.buttons))
 
-            if any(pressed) or task_run:
-                app.render(now, pressed)
+            if self.screen and (any(pressed) or task_run):
+                self.screen.button(now, pressed)
+                self.screen.render(now)

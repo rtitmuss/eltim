@@ -21,4 +21,5 @@ kernel.install_any_updates('rtitmuss', 'eltim')
 gc.collect()
 micropython.mem_info()
 
-kernel.run(Eltim(kernel, display))
+app = Eltim(kernel, display)
+kernel.run()

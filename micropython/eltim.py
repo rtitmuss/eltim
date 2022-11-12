@@ -21,23 +21,17 @@ def _highest_level(level):
     return 'LOW'
 
 
-class Eltim:
+class PriceScreen:
 
-    def __init__(self, kernel, display):
-        self.kernel = kernel
-        self.config = kernel.config
-        self.display = display
+    def __init__(self, eltim):
+        self.eltim = eltim
+        self.config = eltim.config
+        self.kernel = eltim.kernel
 
         self.appliance_idx = 0
         self.time_offset = 0
 
-        self.pricePerHour = ()
-        self.levelPerHour = ()
-
-        self.kernel.add_task('check_prices', 0,
-                             lambda now: self._check_prices(now))
-
-    def render(self, now, pressed):
+    def button(self, now, pressed):
         if pressed[0]:
             self.appliance_idx = (self.appliance_idx + 1) % len(
                 self.config.APPLIANCE)
@@ -47,8 +41,86 @@ class Eltim:
             self.kernel.add_task('time_offset', 5000,
                                  lambda now: self._reset_time_offset())
 
-        if len(self.pricePerHour) > 0:
-            self._display_appliance(now)
+        if pressed[2]:
+            self.kernel.set_screen(
+                TimerScreen(self.eltim, self, self.appliance_idx))
+
+    def _reset_time_offset(self):
+        self.time_offset = 0
+
+    def render(self, now):
+        pricePerHour = self.eltim.pricePerHour
+        levelPerHour = self.eltim.levelPerHour
+
+        if len(pricePerHour) == 0:
+            return
+
+        time = now if self.time_offset == 0 else Clock(now.hour +
+                                                       self.time_offset)
+
+        appliance = self.config.APPLIANCE[self.appliance_idx]
+
+        cost = price.appliance_cost(pricePerHour, time,
+                                    appliance['kwhPerHour'])
+        level = list(
+            map(
+                lambda i: _highest_level(levelPerHour[
+                    now.hour + i:now.hour + i + len(appliance['kwhPerHour'])]),
+                range(MAX_TIME_OFFSET)))
+
+        cheapestTime, cheapestCost = price.cheapest_hour_and_cost(
+            pricePerHour, now, appliance['kwhPerHour'])
+        cheapestLevel = _highest_level(
+            levelPerHour[cheapestTime.hour:cheapestTime.hour +
+                         len(appliance['kwhPerHour'])])
+
+        self.eltim.display.show_appliance(appliance['name'],
+                                          self.config.CURRENCY,
+                                          self.appliance_idx,
+                                          len(self.config.APPLIANCE), now,
+                                          time, cost, level, cheapestTime,
+                                          cheapestCost, cheapestLevel)
+
+
+class TimerScreen:
+
+    def __init__(self, eltim, back_screen, appliance_idx):
+        self.eltim = eltim
+        self.config = eltim.config
+        self.kernel = eltim.kernel
+
+        self.back_screen = back_screen
+        self.appliance_idx = appliance_idx
+
+        self.kernel.add_task(
+            'timer_screen', 5000,
+            lambda now: self.kernel.set_screen(self.back_screen))
+
+    def button(self, now, pressed):
+        if any(pressed):
+            self.kernel.cancel_task('timer_screen')
+            self.kernel.set_screen(self.back_screen)
+
+    def render(self, now):
+        appliance = self.config.APPLIANCE[self.appliance_idx]
+
+        self.eltim.display.show_status(now, 'test', appliance['name'])
+
+
+class Eltim:
+
+    def __init__(self, kernel, display):
+        self.kernel = kernel
+        self.config = kernel.config
+        self.display = display
+
+        self.pricePerHour = ()
+        self.levelPerHour = ()
+
+        self.kernel.set_screen(PriceScreen(self))
+
+        self.kernel.add_task('check_prices', 0,
+                             lambda now: self._check_prices(now))
 
     def _check_prices(self, now):
         print('\n{}'.format(now))
@@ -101,32 +173,3 @@ class Eltim:
             cheapestTime, \
             now.diff(cheapestTime), \
             self.levelPerHour[cheapestTime.hour]))
-
-    def _display_appliance(self, now):
-        time = now if self.time_offset == 0 else Clock(now.hour +
-                                                       self.time_offset)
-
-        appliance = self.config.APPLIANCE[self.appliance_idx]
-
-        cost = price.appliance_cost(self.pricePerHour, time,
-                                    appliance['kwhPerHour'])
-        level = list(
-            map(
-                lambda i: _highest_level(self.levelPerHour[
-                    now.hour + i:now.hour + i + len(appliance['kwhPerHour'])]),
-                range(MAX_TIME_OFFSET)))
-
-        cheapestTime, cheapestCost = price.cheapest_hour_and_cost(
-            self.pricePerHour, now, appliance['kwhPerHour'])
-        cheapestLevel = _highest_level(
-            self.levelPerHour[cheapestTime.hour:cheapestTime.hour +
-                              len(appliance['kwhPerHour'])])
-
-        self.display.show_appliance(appliance['name'], self.config.CURRENCY,
-                                    self.appliance_idx,
-                                    len(self.config.APPLIANCE), now, time,
-                                    cost, level, cheapestTime, cheapestCost,
-                                    cheapestLevel)
-
-    def _reset_time_offset(self):
-        self.time_offset = 0
