@@ -68,11 +68,8 @@ class PriceScreen:
                     now.hour + i:now.hour + i + len(appliance['kwhPerHour'])]),
                 range(MAX_TIME_OFFSET)))
 
-        cheapestTime, cheapestCost = price.cheapest_hour_and_cost(
-            pricePerHour, now, appliance['kwhPerHour'])
-        cheapestLevel = _highest_level(
-            levelPerHour[cheapestTime.hour:cheapestTime.hour +
-                         len(appliance['kwhPerHour'])])
+        cheapestTime, cheapestCost, cheapestLevel = self.eltim.cheapest_for_appliance(
+            now, appliance)
 
         self.eltim.display.show_appliance(appliance['name'],
                                           self.config.CURRENCY,
@@ -93,7 +90,7 @@ class TimerScreen:
         self.appliance_idx = appliance_idx
 
         self.kernel.add_task(
-            'timer_screen', 5000,
+            'timer_screen', 60000,
             lambda now: self.kernel.set_screen(self.back_screen))
 
     def button(self, now, pressed):
@@ -102,9 +99,16 @@ class TimerScreen:
             self.kernel.set_screen(self.back_screen)
 
     def render(self, now):
-        appliance = self.config.APPLIANCE[self.appliance_idx]
+        pricePerHour = self.eltim.pricePerHour
+        levelPerHour = self.eltim.levelPerHour
 
-        self.eltim.display.show_status(now, 'test', appliance['name'])
+        appliance = self.config.APPLIANCE[self.appliance_idx]
+        cheapestTime, cheapestCost, cheapestLevel = self.eltim.cheapest_for_appliance(
+            now, appliance)
+
+        self.eltim.display.show_timer(appliance['name'], self.config.CURRENCY,
+                                      cheapestTime, cheapestCost,
+                                      cheapestLevel)
 
 
 class Eltim:
@@ -173,3 +177,12 @@ class Eltim:
             cheapestTime, \
             now.diff(cheapestTime), \
             self.levelPerHour[cheapestTime.hour]))
+
+    def cheapest_for_appliance(self, now, appliance):
+        cheapestTime, cheapestCost = price.cheapest_hour_and_cost(
+            self.pricePerHour, now, appliance['kwhPerHour'])
+        cheapestLevel = _highest_level(
+            self.levelPerHour[cheapestTime.hour:cheapestTime.hour +
+                              len(appliance['kwhPerHour'])])
+
+        return (cheapestTime, cheapestCost, cheapestLevel)

@@ -138,3 +138,28 @@ class Display:
             x += bar_len
 
         display.update()
+
+    def show_timer(self, name, currency, time, cost, level):
+        display = self.display
+
+        display.set_pen(self.BLACK)
+        display.clear()
+
+        display.set_pen(self.WHITE)
+
+        display.set_font("sans")
+        display.text(name, 10, LINE_1, 240, 1)
+        display.text('timer at', 10, LINE_2, 240, 1)
+        display.text(str(time), 10, LINE_3, 240, 1)
+
+        display.set_pen(self.RED)
+        display.text('cancel', 10, LINE_4, 240, 1)
+
+        display.set_pen(self.GREEN)
+        text_right_align(display, 'ok', 230, LINE_4, 240, 1)
+
+        display.set_pen(self.level_to_color(level))
+        text_right_align(display, '{:.2f}{}'.format(cost, currency), 230,
+                         LINE_3, 240, 1)
+
+        display.update()
