@@ -113,7 +113,7 @@ class TimerScreen:
 
     def button(self, now, pressed):
         if pressed[3]:
-            self.eltim.set_timer(self.appliance, self.timer_at)
+            self.eltim.set_timer(now, self.appliance, self.timer_at)
             self._back()
 
         if pressed[1]:
@@ -222,10 +222,13 @@ class Eltim:
         servo.to_min()
         time.sleep(1)
 
-    def set_timer(self, appliance, timer_at):
-        print('set timer {} at {}'.format(appliance['name'], timer_at))
+    def set_timer(self, now, appliance, timer_at):
+        timer_millis = now.diff(timer_at).to_millis()
+        print('set timer {} at {} ({} millis)'.format(appliance['name'],
+                                                      timer_at, timer_millis))
         self.timer_at[appliance['name']] = timer_at
-        self.kernel.add_task('timer_{}'.format(appliance['name']), 5000,
+        self.kernel.add_task('timer_{}'.format(appliance['name']),
+                             timer_millis,
                              lambda now: self.timer_fired(appliance))
 
     def cancel_timer(self, appliance):

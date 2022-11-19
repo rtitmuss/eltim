@@ -54,6 +54,9 @@ class Clock:
             return Clock(time.hour - self.hour)
         return Clock(time.hour - self.hour - 1, 60 - self.minute)
 
+    def to_millis(self):
+        return self.hour * 360000 + self.minute * 60000 + self.second * 1000
+
     def round_up(self, interval=10):
         m = (ceil(self.minute / interval) * interval) - self.minute
         if m == 0:
