@@ -5,6 +5,9 @@
 import gc
 import math
 import micropython
+import time
+
+from servo import Servo
 
 from clock import Clock
 import price
@@ -43,14 +46,16 @@ class PriceScreen:
 
         if pressed[2]:
             appliance = self.config.APPLIANCE[self.appliance_idx]
-            cheapestTime, cheapestCost, cheapestLevel = self.eltim.cheapest_for_appliance(
-                now, appliance)
 
-            timer_at = cheapestTime if self.time_offset == 0 else Clock(
-                now.hour + self.time_offset)
+            if 'servo' in appliance:
+                cheapestTime, cheapestCost, cheapestLevel = self.eltim.cheapest_for_appliance(
+                    now, appliance)
 
-            self.kernel.set_screen(
-                TimerScreen(self.eltim, self, appliance, timer_at))
+                timer_at = cheapestTime if self.time_offset == 0 else Clock(
+                    now.hour + self.time_offset)
+
+                self.kernel.set_screen(
+                    TimerScreen(self.eltim, self, appliance, timer_at))
 
     def _reset_time_offset(self):
         self.time_offset = 0
@@ -137,6 +142,10 @@ class Eltim:
         self.levelPerHour = ()
         self.timer_at = {}
 
+        self.servo = dict(
+            map(lambda e: (e['name'], Servo(e['servo'])),
+                filter(lambda e: 'servo' in e, self.config.APPLIANCE)))
+
         self.kernel.set_screen(PriceScreen(self))
 
         self.kernel.add_task('check_prices', 0,
@@ -206,6 +215,12 @@ class Eltim:
     def timer_fired(self, appliance):
         self.cancel_timer(appliance)
         print('timer {}'.format(appliance['name']))
+
+        servo = self.servo[appliance['name']]
+        servo.value(80)
+        time.sleep(1)
+        servo.to_min()
+        time.sleep(1)
 
     def set_timer(self, appliance, timer_at):
         print('set timer {} at {}'.format(appliance['name'], timer_at))
