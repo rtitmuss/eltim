@@ -6,7 +6,6 @@ import gc
 import micropython
 
 from display import Display
-from eltim import Eltim
 from kernel import Kernel
 
 gc.collect()
@@ -20,6 +19,8 @@ kernel.install_any_updates('rtitmuss', 'eltim')
 
 gc.collect()
 micropython.mem_info()
+
+from eltim import Eltim
 
 app = Eltim(kernel, display)
 kernel.run()
