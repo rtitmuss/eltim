@@ -42,8 +42,15 @@ class PriceScreen:
                                  lambda now: self._reset_time_offset())
 
         if pressed[2]:
+            appliance = self.config.APPLIANCE[self.appliance_idx]
+            cheapestTime, cheapestCost, cheapestLevel = self.eltim.cheapest_for_appliance(
+                now, appliance)
+
+            timer_at = cheapestTime if self.time_offset == 0 else Clock(
+                now.hour + self.time_offset)
+
             self.kernel.set_screen(
-                TimerScreen(self.eltim, self, self.appliance_idx))
+                TimerScreen(self.eltim, self, appliance, timer_at))
 
     def _reset_time_offset(self):
         self.time_offset = 0
@@ -76,39 +83,47 @@ class PriceScreen:
                                           self.appliance_idx,
                                           len(self.config.APPLIANCE), now,
                                           time, cost, level, cheapestTime,
-                                          cheapestCost, cheapestLevel)
+                                          cheapestCost, cheapestLevel,
+                                          self.eltim.is_timer_at(appliance))
 
 
 class TimerScreen:
 
-    def __init__(self, eltim, back_screen, appliance_idx):
+    def __init__(self, eltim, back_screen, appliance, timer_at):
         self.eltim = eltim
         self.config = eltim.config
         self.kernel = eltim.kernel
 
         self.back_screen = back_screen
-        self.appliance_idx = appliance_idx
+        self.appliance = appliance
+        self.timer_at = timer_at
 
         self.kernel.add_task(
             'timer_screen', 60000,
             lambda now: self.kernel.set_screen(self.back_screen))
 
+    def _back(self):
+        self.kernel.cancel_task('timer_screen')
+        self.kernel.set_screen(self.back_screen)
+
     def button(self, now, pressed):
-        if any(pressed):
-            self.kernel.cancel_task('timer_screen')
-            self.kernel.set_screen(self.back_screen)
+        if pressed[3]:
+            self.eltim.set_timer(self.appliance, self.timer_at)
+            self._back()
+
+        if pressed[1]:
+            self.eltim.cancel_timer(self.appliance)
+            self._back()
 
     def render(self, now):
         pricePerHour = self.eltim.pricePerHour
         levelPerHour = self.eltim.levelPerHour
 
-        appliance = self.config.APPLIANCE[self.appliance_idx]
         cheapestTime, cheapestCost, cheapestLevel = self.eltim.cheapest_for_appliance(
-            now, appliance)
+            self.timer_at, self.appliance)
 
-        self.eltim.display.show_timer(appliance['name'], self.config.CURRENCY,
-                                      cheapestTime, cheapestCost,
-                                      cheapestLevel)
+        self.eltim.display.show_timer(self.appliance['name'],
+                                      self.config.CURRENCY, self.timer_at)
 
 
 class Eltim:
@@ -120,6 +135,7 @@ class Eltim:
 
         self.pricePerHour = ()
         self.levelPerHour = ()
+        self.timer_at = {}
 
         self.kernel.set_screen(PriceScreen(self))
 
@@ -186,3 +202,22 @@ class Eltim:
                               len(appliance['kwhPerHour'])])
 
         return (cheapestTime, cheapestCost, cheapestLevel)
+
+    def timer_fired(self, appliance):
+        self.cancel_timer(appliance)
+        print('timer {}'.format(appliance['name']))
+
+    def set_timer(self, appliance, timer_at):
+        print('set timer {} at {}'.format(appliance['name'], timer_at))
+        self.timer_at[appliance['name']] = timer_at
+        self.kernel.add_task('timer_{}'.format(appliance['name']), 5000,
+                             lambda now: self.timer_fired(appliance))
+
+    def cancel_timer(self, appliance):
+        print('cancel timer {}'.format(appliance['name']))
+        if appliance['name'] in self.timer_at:
+            del self.timer_at[appliance['name']]
+        self.kernel.cancel_task('timer_{}'.format(appliance['name']))
+
+    def is_timer_at(self, appliance):
+        return self.timer_at.get(appliance['name'])

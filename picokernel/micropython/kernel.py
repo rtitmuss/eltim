@@ -38,7 +38,8 @@ class Kernel:
         }
 
     def cancel_task(self, name):
-        del self.tasks[name]
+        if name in self.tasks:
+            del self.tasks[name]
 
     def exec_tasks(self, *args):
         now_ms = time.ticks_ms()

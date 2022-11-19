@@ -69,7 +69,8 @@ class Display:
         display.update()
 
     def show_appliance(self, name, currency, idx, total_idx, now, time, cost,
-                       level, cheapest_time, cheapest_cost, cheapest_level):
+                       level, cheapest_time, cheapest_cost, cheapest_level,
+                       timer_at):
         display = self.display
         delay_time = now.diff(cheapest_time)
         time_offset = time.hour - now.hour
@@ -98,27 +99,31 @@ class Display:
         display.set_font("sans")
         display.text(name, 10, LINE_1, 240, 1)
 
-        if time_offset == 0:
-            display.text('now', 10, LINE_2, 240, 1)
+        if timer_at:
+            display.text('timer set', 10, LINE_2, 240, 1)
+            display.text(str(timer_at), 10, LINE_3, 240, 1)
         else:
-            display.text(str(time), 10, LINE_2, 240, 1)
+            if time_offset == 0:
+                display.text('now', 10, LINE_2, 240, 1)
+            else:
+                display.text(str(time), 10, LINE_2, 240, 1)
 
-        display.set_pen(self.level_to_color(time_level))
-        text_right_align(display, '{:.2f}{}'.format(cost, currency), 230,
-                         LINE_2, 240, 1)
+            display.set_pen(self.level_to_color(time_level))
+            text_right_align(display, '{:.2f}{}'.format(cost, currency), 230,
+                             LINE_2, 240, 1)
 
-        if cheapest_cost < cost:
-            display.set_pen(self.WHITE)
+            if cheapest_cost < cost:
+                display.set_pen(self.WHITE)
 
-            display.text(str(cheapest_time), 10, LINE_3, 240, 1)
-            display.text(
-                'in {}h {}m'.format(delay_time.hour, delay_time.minute), 10,
-                LINE_4, 240, 1)
+                display.text(str(cheapest_time), 10, LINE_3, 240, 1)
+                display.text(
+                    'in {}h {}m'.format(delay_time.hour, delay_time.minute),
+                    10, LINE_4, 240, 1)
 
-            display.set_pen(self.level_to_color(cheapest_level))
-            text_right_align(display,
-                             '{:.2f}{}'.format(cheapest_cost,
-                                               currency), 230, LINE_3, 240, 1)
+                display.set_pen(self.level_to_color(cheapest_level))
+                text_right_align(display,
+                                 '{:.2f}{}'.format(cheapest_cost, currency),
+                                 230, LINE_3, 240, 1)
 
         len_level = len(level)
         total_len = floor(230 / len_level) * len_level
@@ -139,7 +144,7 @@ class Display:
 
         display.update()
 
-    def show_timer(self, name, currency, time, cost, level):
+    def show_timer(self, name, currency, time):
         display = self.display
 
         display.set_pen(self.BLACK)
@@ -157,9 +162,5 @@ class Display:
 
         display.set_pen(self.GREEN)
         text_right_align(display, 'ok', 230, LINE_4, 240, 1)
-
-        display.set_pen(self.level_to_color(level))
-        text_right_align(display, '{:.2f}{}'.format(cost, currency), 230,
-                         LINE_3, 240, 1)
 
         display.update()
