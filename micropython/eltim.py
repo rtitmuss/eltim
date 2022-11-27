@@ -146,6 +146,9 @@ class Eltim:
             map(lambda e: (e['name'], Servo(e['servo'])),
                 filter(lambda e: 'servo' in e, self.config.APPLIANCE)))
 
+        for s in self.servo.values():
+            s.to_min()
+
         self.kernel.set_screen(PriceScreen(self))
 
         self.kernel.add_task('check_prices', 0,
