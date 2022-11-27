@@ -90,8 +90,9 @@ class Display:
 
         display.set_pen(self.WHITE)
 
-        scroll_len = floor(135 / total_idx)
-        display.line(1, scroll_len * idx, 1, (scroll_len * idx) + scroll_len)
+        if total_idx > 1:
+            scroll_len = floor(135 / total_idx)
+            display.line(1, scroll_len * idx, 1, (scroll_len * idx) + scroll_len)
 
         display.set_font("bitmap8")
         text_right_align(display, str(now), 230, 114, 240, 1)
