@@ -2,6 +2,8 @@
 
 A gadget to show the cheapest time to use your appliances (dishwasher, tumble dryer, etc) when you have an hourly agreement with [Tibber](https://tibber.com/se). The display shows the cost to run the appliance now compared to the cheapest time. The led is red or green when it's expensive or cheap. The top left button toggles through different appliances, and the bottom right button shows the cost at different times.
 
+A more complex build allows you to make [dumb appliances smarter](TIMER.md), allowing them to automatically start when the electricity is cheaper. 
+
 ![](img/20221127_124351.jpg)
 
 ## Hardware
@@ -91,7 +93,7 @@ APPLIANCE = [{
 }]
 ```
 
-Save the updated configuration file and restart the device.  
+Save the updated configuration file and restart the device. It will then connect to your wifi and download the latest electricity prices from Tibber. Enjoy! 
 
 
 ## Development
