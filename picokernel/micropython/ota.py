@@ -34,7 +34,7 @@ def _rmdir(directory):
             path = '{}/{}'.format(directory, entry[0])
             is_dir = entry[1] == 0x4000
             if is_dir:
-                self._rmdir(path)
+                _rmdir(path)
             else:
                 os.remove(path)
         os.rmdir(directory)
