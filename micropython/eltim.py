@@ -112,6 +112,9 @@ class TimerScreen:
         self.kernel.set_screen(self.back_screen)
 
     def button(self, now, pressed):
+        if pressed[0]:
+            self.eltim.timer_fired(self.appliance)
+
         if pressed[3]:
             self.eltim.set_timer(now, self.appliance, self.timer_at)
             self._back()
@@ -123,9 +126,6 @@ class TimerScreen:
     def render(self, now):
         pricePerHour = self.eltim.pricePerHour
         levelPerHour = self.eltim.levelPerHour
-
-        cheapestTime, cheapestCost, cheapestLevel = self.eltim.cheapest_for_appliance(
-            self.timer_at, self.appliance)
 
         self.eltim.display.show_timer(self.appliance['name'],
                                       self.config.CURRENCY, self.timer_at)
