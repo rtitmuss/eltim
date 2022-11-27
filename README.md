@@ -4,6 +4,7 @@ A gadget to show the cheapest electric prices using tibber api
 ## Hardware
 - [Raspberry Pi Pico W](https://www.raspberrypi.com/products/raspberry-pi-pico/)
 - [Pico Display Pack](https://shop.pimoroni.com/products/pico-display-pack)
+- 3d printed case available from (https://www.printables.com/model/326265-raspberry-pi-pico-pico-display-pack-case)
 
 ## Install
 
