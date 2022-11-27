@@ -23,8 +23,10 @@ APPLIANCE = [{
     'kwhPerHour': (0.6, 0.02, 0.28)
 }, {
     'name': 'washer',
-    'kwhPerHour': (0.9, 0.1)
+    'kwhPerHour': (0.9, 0.1),
+    'servo': 26
 }, {
     'name': 'dryer',
-    'kwhPerHour': (1.5, 0.7)
+    'kwhPerHour': (1.5, 0.7),
+    'servo': 27
 }]
